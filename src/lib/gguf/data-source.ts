@@ -26,7 +26,11 @@ export class BrowserFileDataSource extends DataSource {
     }
     buffer.set(arr.subarray(0, size), 0);
     this.position += arr.length;
-    return arr.length === size;
+    if (arr.length < size) {
+      this._eof = true;
+      return false;
+    }
+    return true;
   }
 
   async seek(position: number): Promise<boolean> {

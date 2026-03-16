@@ -35,6 +35,14 @@ function buildGGUFBuffer(params: {
   pushU64(0);
   pushU64(metadataCount);
 
+  // parameter_count (optional, stored as UINT64) — must come before
+  // the required fields so the parser reads it before early-exit
+  if (params.parameter_count) {
+    pushString("general.parameter_count");
+    pushU32(GGUFType.UINT64);
+    pushU64(params.parameter_count);
+  }
+
   // attention.head_count
   pushString("llama.attention.head_count");
   pushU32(GGUFType.UINT32);
@@ -54,13 +62,6 @@ function buildGGUFBuffer(params: {
   pushString("llama.embedding_length");
   pushU32(GGUFType.UINT32);
   pushU32(params.embedding_length);
-
-  // parameter_count (optional, stored as UINT64)
-  if (params.parameter_count) {
-    pushString("general.parameter_count");
-    pushU32(GGUFType.UINT64);
-    pushU64(params.parameter_count);
-  }
 
   const totalLen = parts.reduce((sum, p) => sum + p.length, 0);
   const result = new Uint8Array(totalLen);
